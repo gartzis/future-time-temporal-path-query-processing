@@ -314,14 +314,3 @@ The code follows a simple research-script style.
 
 The paper experiments were run on a machine with 128 CPU threads, 1 TiB RAM, and two NVIDIA H200 GPUs.
 
-## Citation
-
-If you use this code, please cite the paper:
-
-```bibtex
-@inproceedings{gkartzios_future_time_paths,
-  title = {Future-Time Shortest Temporal Path Query Processing under Prediction Uncertainty},
-  author = {Gkartzios, Christos and Pitoura, Evaggelia},
-  year = {2026}
-}
-```
