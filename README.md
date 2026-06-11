@@ -1,10 +1,30 @@
-# Future-Time Shortest Temporal Path Query Processing under Prediction Uncertainty
+<div align="center">
 
+<h1>
+Future-Time Shortest Temporal Path Query Processing<br>
+under Prediction Uncertainty
+</h1>
+
+<strong>Research code for reproducing the experiments of the paper.</strong>
+
+<br><br>
+
+<a href="#quick-start">Quick start</a> · <a href="#experiments">Experiments</a> · <a href="#input-data">Input data</a> 
+
+<br><br>
+
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-supported-ee4c2c)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-supported-f7931e)
+![NetworkX](https://img.shields.io/badge/NetworkX-supported-376795)
+![Temporal Graphs](https://img.shields.io/badge/Temporal%20Graphs-query%20processing-blueviolet)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20644952.svg)](https://doi.org/10.5281/zenodo.20644952)
 
-Research code for reproducing the experiments of the paper:
+</div>
 
-**Future-Time Shortest Temporal Path Query Processing under Prediction Uncertainty**
+---
+
+
 
 The paper studies future-time shortest temporal path queries. A query is issued at the current timestamp, but the answer concerns a future timestamp and may depend on edges that have not yet appeared. The code combines temporal query processing with prediction oracles, constructs candidate future temporal paths, and ranks them by estimated shortest-path probability.
 
@@ -212,19 +232,20 @@ It compares cache-enabled and cache-disabled execution for the real-oracle pipel
 
 The real-oracle pipeline supports the following oracle names:
 
-| Code name      | Paper name   | Oracle type           | Temporal information                                                                                         |
-| -------------- | ------------ | --------------------- | ------------------------------------------------------------------------------------------------------------ |
-| `n2vlp_static` | N2VLP-Static | Edge-scoring oracle   | Non-temporal. Scores node pairs using static Node2Vec embeddings computed on the observed prefix graph.      |
-| `tgn_max_time` | TGN-MaxTime  | Edge-scoring oracle   | Temporal. Scores candidate edges across future timestamps and keeps the timestamp with the maximum score.    |
-| `tgn_per_time` | TGN-PerTime  | Edge-scoring oracle   | Temporal. Scores candidate edges separately at each rollout timestamp.                                       |
-| `jodie_frozen` | JODIE-Frozen | Target-ranking oracle | Temporal model. Uses the observed-prefix JODIE state and keeps it fixed during the future rollout.           |
-| `jodie_update` | JODIE-Update | Target-ranking oracle | Temporal model. Updates the query-local JODIE state with accepted predicted interactions during the rollout. |
+| Code name      | Paper name   | Oracle type           | Temporal use                                                                        |
+| -------------- | ------------ | --------------------- | ----------------------------------------------------------------------------------- |
+| `n2vlp_static` | N2VLP-Static | Edge-scoring oracle   | Static. Scores node pairs using Node2Vec embeddings from the observed prefix graph. |
+| `tgn_max_time` | TGN-MaxTime  | Edge-scoring oracle   | Temporal. Scores future timestamps and keeps the maximum-score timestamp.           |
+| `tgn_per_time` | TGN-PerTime  | Edge-scoring oracle   | Temporal. Scores candidate edges at each rollout timestamp.                         |
+| `jodie_frozen` | JODIE-Frozen | Target-ranking oracle | Temporal model with fixed observed-prefix state during rollout.                     |
+| `jodie_update` | JODIE-Update | Target-ranking oracle | Temporal model with query-local state updates during rollout.                       |
 
 To change the oracle in `main.py`, edit:
 
 ```python
 ORACLE_NAME = "n2vlp_static"
 ```
+
 
 
 ## Input data
