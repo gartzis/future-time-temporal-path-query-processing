@@ -57,7 +57,7 @@ The repository supports the main components of the paper:
 
 | Code name | Paper-style name | Type  |
 |---|---|---|
-| `candidate_space` | Candidate-space oracle 
+| `candidate_space` | Candidate-space oracle | Controlled oracle 
 | `optimal_temporal_edge` | Optimal temporal-edge oracle | Controlled oracle 
 | `n2vlp_static` | N2VLP-Static | Edge-scoring oracle 
 | `tgn_max_time` | TGN-MaxTime | Edge-scoring oracle 
