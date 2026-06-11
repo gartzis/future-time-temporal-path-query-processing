@@ -55,15 +55,15 @@ The repository supports the main components of the paper:
 
 ## Implemented oracle modes
 
-| Code name | Paper-style name | Type | Used for |
-|---|---|---|---|
-| `candidate_space` | Candidate-space oracle | Controlled oracle | available in `main.py`, while the paper RQ1 script uses the standalone candidate-generation audit |
-| `optimal_temporal_edge` | Optimal temporal-edge oracle | Controlled oracle | available in `main.py`, while the paper RQ2 script uses the standalone optimal-edge audit |
-| `n2vlp_static` | N2VLP-Static | Edge-scoring oracle | RQ3, RQ4, RQ5 |
-| `tgn_max_time` | TGN-MaxTime | Edge-scoring oracle | RQ3, RQ4, RQ5 |
-| `tgn_per_time` | TGN-PerTime | Edge-scoring oracle | RQ3, RQ4 |
-| `jodie_frozen` | JODIE-Frozen | Target-ranking oracle | RQ3, RQ4, RQ5 |
-| `jodie_update` | JODIE-Update | Target-ranking oracle | RQ3, RQ4, RQ5 |
+| Code name | Paper-style name | Type  |
+|---|---|---|
+| `candidate_space` | Candidate-space oracle 
+| `optimal_temporal_edge` | Optimal temporal-edge oracle | Controlled oracle 
+| `n2vlp_static` | N2VLP-Static | Edge-scoring oracle 
+| `tgn_max_time` | TGN-MaxTime | Edge-scoring oracle 
+| `tgn_per_time` | TGN-PerTime | Edge-scoring oracle 
+| `jodie_frozen` | JODIE-Frozen | Target-ranking oracle 
+| `jodie_update` | JODIE-Update | Target-ranking oracle 
 
 ## Requirements
 
