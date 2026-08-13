@@ -9,7 +9,7 @@ under Prediction Uncertainty
 
 <br><br>
 
-<a href="#quick-start">Quick start</a> · <a href="#experiments">Experiments</a> · <a href="#input-data">Input data</a> 
+<a href="#quick-start">Quick start</a> · <a href="#experiments">Experiments</a> · <a href="#additional-experiments">Additional experiments</a> · <a href="#input-data">Input data</a>
 
 <br><br>
 
@@ -227,6 +227,282 @@ python Experiments/run_RQ5_runtime_cache.py
 This script measures training time, query-processing time, and cache behavior.
 
 It compares cache-enabled and cache-disabled execution for the real-oracle pipeline.
+
+## Additional experiments
+
+This section contains additional experiments that complement the evaluation in the paper. They further analyze the path-ranking step, the relation to the previous single-future-edge setting, the occurrence of paths with multiple future temporal edges, and the behavior of the framework on a larger temporal graph.
+
+### Path-ranking baselines
+
+We compare our framework with four simpler path-processing methods.
+
+For each query, we first run the prediction oracle and obtain the accepted future temporal edges over the future timestamps. All methods use the same observed temporal graph and exactly the same accepted future temporal edges.
+
+The baselines do not rerank a common set of candidate paths. Instead, each method independently constructs candidate temporal paths from the same graph evidence and returns the paths that best satisfy its own ranking objective. Thus, the future-edge evidence is fixed across methods, while the path-processing objective changes.
+
+The methods are:
+
+* **Distance:** ranks candidate temporal paths by path length, with shorter paths ranked first.
+* **Time:** ranks candidate temporal paths by formation time, with earlier paths ranked first.
+* **Distance-Time:** ranks candidate temporal paths by the temporal shortest-path order, first by path length and then by formation time.
+* **Existence:** ranks candidate temporal paths by path-existence probability, with larger probability ranked first.
+* **Ours:** ranks candidate temporal paths by estimated shortest-path probability, which considers both whether a path exists and whether any shorter or earlier candidate path also exists.
+
+
+For this comparison, we use the same path-quality errors as in the main evaluation, but report their mean over the returned paths instead of their score-weighted versions. This gives a common evaluation across methods whose ranking scores have different meanings.
+
+We report:
+
+- **PEE:** measures the difference between the predicted and true paths using normalized edit distance.
+- **NDMSE:** measures the normalized difference between the predicted and true path lengths.
+- **NTMSE:** measures the normalized difference between the predicted and true path formation times.
+- **Coverage:** measures the fraction of queries for which at least one future-valid path is returned.
+- **Path Recall@10:** measures whether the true future path appears among the first 10 returned paths.
+- **Path MRR@10:** measures how early the true future path appears in the returned ranking.
+-  **Shorter-path selection:** measures the fraction of returned paths that are shorter than the true future path.
+
+For each path-quality metric, we report the mean over the first k future-valid returned paths:
+
+```math
+\mathrm{Mean}\ M@k(q)
+=
+\frac{1}{k_q}
+\sum_{i=1}^{k_q}
+M(\hat{P}_{q,i}, P_q),
+\qquad
+M \in \{\mathrm{PEE}, \mathrm{NDMSE}, \mathrm{NTMSE}\}.
+```
+
+Here, k_q is the number of future-valid paths returned up to k. Mean path-quality errors are averaged over covered queries, while Coverage, Path Recall@k, and Path MRR@k follow the definitions of the main evaluation.
+
+
+<p align="center"><strong>Quality of future-time query answers.</strong></p>
+
+
+| Oracle / Method | CollegeMsg | Enron | Email-Eu | Bitcoin |
+|---|---:|---:|---:|---:|
+| **Mean PEE ↓** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | 0.401 | 0.406 | 0.461 | 0.357 |
+| Time | 0.481 | 0.530 | 0.656 | 0.492 |
+| Distance-Time | 0.399 | **0.400** | **0.460** | 0.356 |
+| Existence | 0.479 | 0.520 | 0.634 | 0.504 |
+| Ours | **0.385** | 0.409 | **0.460** | **0.351** |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | 0.379 | **0.407** | 0.444 | 0.353 |
+| Time | 0.476 | 0.530 | 0.602 | 0.502 |
+| Distance-Time | 0.383 | 0.413 | 0.451 | 0.375 |
+| Existence | 0.466 | 0.525 | 0.581 | 0.492 |
+| Ours | **0.360** | 0.418 | **0.434** | **0.335** |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | 0.379 | **0.405** | 0.445 | 0.353 |
+| Time | 0.484 | 0.552 | 0.597 | 0.472 |
+| Distance-Time | 0.380 | 0.407 | 0.442 | 0.353 |
+| Existence | 0.466 | 0.525 | 0.581 | 0.492 |
+| Ours | **0.361** | 0.418 | **0.429** | **0.324** |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | 0.372 | 0.430 | 0.430 | 0.405 |
+| Time | 0.481 | 0.542 | 0.656 | 0.468 |
+| Distance-Time | 0.359 | 0.426 | 0.421 | 0.344 |
+| Existence | 0.481 | 0.542 | 0.656 | 0.467 |
+| Ours | **0.320** | **0.393** | **0.418** | **0.308** |
+| **JODIE-Update** |  |  |  |  |
+| Distance | 0.375 | 0.398 | 0.451 | 0.388 |
+| Time | 0.482 | 0.542 | 0.656 | 0.468 |
+| Distance-Time | 0.372 | 0.407 | 0.454 | 0.347 |
+| Existence | 0.485 | 0.556 | 0.659 | 0.467 |
+| Ours | **0.329** | **0.394** | **0.434** | **0.305** |
+| **Mean NDMSE ↓** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | **0.114** | **0.092** | **0.140** | **0.092** |
+| Time | 0.227 | 0.243 | 0.345 | 0.252 |
+| Distance-Time | **0.114** | **0.092** | **0.140** | **0.092** |
+| Existence | 0.227 | 0.233 | 0.339 | 0.304 |
+| Ours | 0.146 | 0.118 | 0.153 | 0.133 |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | **0.147** | **0.133** | **0.150** | **0.117** |
+| Time | 0.244 | 0.229 | 0.344 | 0.260 |
+| Distance-Time | **0.147** | **0.133** | **0.150** | **0.117** |
+| Existence | 0.234 | 0.212 | 0.333 | 0.283 |
+| Ours | 0.155 | 0.140 | 0.166 | 0.142 |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | **0.147** | **0.132** | **0.149** | **0.117** |
+| Time | 0.240 | 0.232 | 0.328 | 0.226 |
+| Distance-Time | **0.147** | **0.132** | **0.149** | **0.117** |
+| Existence | 0.234 | 0.212 | 0.334 | 0.283 |
+| Ours | 0.163 | 0.146 | 0.168 | 0.151 |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | **0.083** | 0.084 | **0.094** | 0.079 |
+| Time | 0.221 | 0.23588 | 0.34119 | 0.228 |
+| Distance-Time | **0.083** | 0.084 | **0.094** | 0.079 |
+| Existence | 0.217 | 0.236 | 0.340 | 0.221 |
+| Ours | 0.094 | **0.083** | 0.106 | **0.065** |
+| **JODIE-Update** |  |  |  |  |
+| Distance | **0.099** | **0.094** | **0.117** | 0.075 |
+| Time | 0.221 | 0.236 | 0.341 | 0.228 |
+| Distance-Time | **0.099** | **0.094** | **0.117** | 0.075 |
+| Existence | 0.216 | 0.241 | 0.342 | 0.221 |
+| Ours | 0.118 | 0.130 | 0.132 | **0.074** |
+| **Mean NTMSE ↓** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | **0.223** | **0.099** | **0.035** | **0.401** |
+| Time | 0.252 | 0.101 | 0.035 | 0.452 |
+| Distance-Time | 0.225 | 0.099 | 0.035 | **0.401** |
+| Existence | 0.252 | 0.101 | 0.035 | 0.451 |
+| Ours | 0.240 | 0.099 | 0.034 | 0.426 |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | **0.150** | **0.076** | **0.048** | **0.167** |
+| Time | 0.203 | 0.092 | 0.053 | 0.452 |
+| Distance-Time | 0.160 | 0.080 | 0.050 | 0.302 |
+| Existence | 0.156 | 0.084 | 0.048 | 0.167 |
+| Ours | 0.181 | 0.084 | 0.050 | 0.287 |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | 0.197 | 0.085 | 0.052 | 0.398 |
+| Time | 0.226 | 0.094 | 0.053 | 0.452 |
+| Distance-Time | 0.206 | 0.088 | 0.052 | 0.401 |
+| Existence | **0.156** | **0.084** | **0.048** | **0.167** |
+| Ours | 0.209 | 0.089 | 0.051 | 0.328 |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | **0.223** | **0.098** | **0.035** | **0.364** |
+| Time | 0.252 | 0.101 | 0.035 | 0.452 |
+| Distance-Time | 0.232 | 0.100 | 0.035 | 0.420 |
+| Existence | 0.250 | 0.100 | 0.035 | 0.45 |
+| Ours | 0.226 | 0.099 | 0.034 | 0.398 |
+| **JODIE-Update** |  |  |  |  |
+| Distance | **0.180** | **0.089** | **0.032** | **0.221** |
+| Time | 0.252 | 0.101 | 0.035 | 0.452 |
+| Distance-Time | 0.197 | 0.093 | 0.034 | 0.345 |
+| Existence | 0.245 | 0.093 | 0.035 | 0.449 |
+| Ours | 0.195 | 0.092 | 0.034 | 0.328 |
+| **Future-path Coverage ↑** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | **1.000** | **1.000** | **1.000** | **1.000** |
+| Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Distance-Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Existence | **1.000** | **1.000** | **1.000** | **1.000** |
+| Ours | **1.000** | **1.000** | **1.000** | **1.000** |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | **0.490** | **0.900** | **0.600** | **1.000** |
+| Time | **0.490** | **0.900** | **0.600** | **1.000** |
+| Distance-Time | **0.490** | **0.900** | **0.600** | **1.000** |
+| Existence | **0.490** | **0.900** | **0.600** | **1.000** |
+| Ours | 0.440 | 0.880 | 0.590 | 0.990 |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | **0.490** | **0.900** | **0.600** | **1.000** |
+| Time | **0.490** | **0.900** | **0.600** | **1.000** |
+| Distance-Time | **0.490** | **0.900** | **0.600** | **1.000** |
+| Existence | **0.490** | **0.900** | **0.600** | **1.000** |
+| Ours | 0.440 | 0.880 | 0.590 | 0.990 |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | **1.000** | **1.000** | **1.000** | **1.000** |
+| Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Distance-Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Existence | **1.000** | **1.000** | **1.000** | **1.000** |
+| Ours | **1.000** | **1.000** | **1.000** | **1.000** |
+| **JODIE-Update** |  |  |  |  |
+| Distance | **1.000** | **1.000** | **1.000** | **1.000** |
+| Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Distance-Time | **1.000** | **1.000** | **1.000** | **1.000** |
+| Existence | **1.000** | **1.000** | **1.000** | **1.000** |
+| Ours | **1.000** | **1.000** | **1.000** | **1.000** |
+
+<p align="center"><strong>Top-10 exact-path ranking and shorter-path selection.</strong></p>
+
+| Oracle / Method | CollegeMsg | Enron | Email-Eu | Bitcoin |
+|---|---:|---:|---:|---:|
+| **Path Recall@10:  ↑** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | **0.350** | **0.200** | 0.080 | **0.520** |
+| Time | 0.000 | 0.020 | 0.000 | 0.000 |
+| Distance-Time | **0.350** | **0.200** | 0.080 | **0.520** |
+| Existence | 0.000 | 0.010 | 0.000 | 0.010 |
+| Ours | 0.230 | 0.110 | **0.120** | 0.320 |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | **0.170** | **0.170** | 0.120 | 0.600 |
+| Time | 0.000 | 0.010 | 0.000 | 0.000 |
+| Distance-Time | 0.150 | 0.140 | 0.100 | 0.290 |
+| Existence | 0.010 | 0.020 | 0.020 | 0.080 |
+| Ours | 0.090 | 0.100 | **0.130** | **0.650** |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | **0.170** | **0.170** | 0.120 | 0.600 |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | **0.170** | 0.150 | 0.120 | 0.600 |
+| Existence | 0.010 | 0.020 | 0.020 | 0.080 |
+| Ours | 0.080 | 0.080 | **0.130** | **0.670** |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | **0.310** | **0.060** | 0.050 | **0.150** |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | **0.310** | 0.050 | **0.060** | **0.150** |
+| Existence | 0.000 | 0.000 | 0.000 | 0.000 |
+| Ours | 0.230 | 0.040 | 0.020 | 0.140 |
+| **JODIE-Update** |  |  |  |  |
+| Distance | **0.370** | **0.190** | **0.100** | **0.300** |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | 0.340 | 0.150 | 0.070 | 0.280 |
+| Existence | 0.000 | 0.000 | 0.000 | 0.000 |
+| Ours | 0.260 | 0.070 | 0.030 | 0.210 |
+| **Path MRR@10:  ↑** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | **0.226** | **0.124** | 0.038 | **0.275** |
+| Time | 0.000 | 0.006 | 0.000 | 0.000 |
+| Distance-Time | **0.226** | **0.124** | 0.038 | **0.275** |
+| Existence | 0.000 | 0.005 | 0.000 | 0.002 |
+| Ours | 0.153 | 0.090 | **0.038** | 0.154 |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | **0.069** | **0.075** | **0.066** | **0.287** |
+| Time | 0.000 | 0.002 | 0.000 | 0.000 |
+| Distance-Time | 0.065 | 0.067 | 0.053 | 0.129 |
+| Existence | 0.010 | 0.015 | 0.015 | 0.065 |
+| Ours | 0.031 | 0.030 | 0.056 | 0.197 |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | **0.069** | **0.075** | **0.066** | **0.287** |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | **0.069** | 0.066 | **0.066** | **0.287** |
+| Existence | 0.010 | 0.015 | 0.015 | 0.065 |
+| Ours | 0.025 | 0.033 | 0.066 | 0.258 |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | 0.207 | **0.053** | 0.036 | 0.125 |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | **0.235** | 0.040 | **0.040** | **0.143** |
+| Existence | 0.000 | 0.000 | 0.000 | 0.000 |
+| Ours | 0.182 | 0.035 | 0.015 | 0.123 |
+| **JODIE-Update** |  |  |  |  |
+| Distance | 0.221 | **0.118** | **0.074** | **0.192** |
+| Time | 0.000 | 0.000 | 0.000 | 0.000 |
+| Distance-Time | **0.222** | 0.057 | 0.044 | 0.185 |
+| Existence | 0.000 | 0.000 | 0.000 | 0.000 |
+| Ours | 0.190 | 0.044 | 0.025 | 0.138 |
+| **Mean shorter-path selection ↓** |  |  |  |  |
+| **N2VLP-Static** |  |  |  |  |
+| Distance | 0.508 | 0.472 | 0.766 | 0.436 |
+| Time | 0.028 | 0.040 | **0.000** | 0.030 |
+| Distance-Time | 0.508 | 0.472 | 0.766 | 0.436 |
+| Existence | **0.008** | **0.032** | 0.006 | **0.002** |
+| Ours | 0.423 | 0.413 | 0.479 | 0.359 |
+| **TGN-MaxTime** |  |  |  |  |
+| Distance | 0.384 | 0.513 | 0.583 | 0.468 |
+| Time | **0.008** | **0.027** | **0.007** | 0.042 |
+| Distance-Time | 0.384 | 0.513 | 0.583 | 0.468 |
+| Existence | 0.016 | 0.040 | 0.013 | **0.016** |
+| Ours | 0.360 | 0.410 | 0.412 | 0.399 |
+| **TGN-PerTime** |  |  |  |  |
+| Distance | 0.384 | 0.513 | 0.590 | 0.468 |
+| Time | **0.008** | 0.058 | 0.017 | 0.044 |
+| Distance-Time | 0.384 | 0.513 | 0.590 | 0.468 |
+| Existence | 0.016 | **0.040** | **0.013** | **0.016** |
+| Ours | 0.371 | 0.429 | 0.422 | 0.395 |
+| **JODIE-Frozen** |  |  |  |  |
+| Distance | 0.348 | 0.346 | 0.586 | 0.256 |
+| Time | **0.016** | **0.030** | **0.006** | **0.028** |
+| Distance-Time | 0.348 | 0.346 | 0.586 | 0.256 |
+| Existence | 0.032 | 0.042 | 0.008 | 0.040 |
+| Ours | 0.447 | 0.437 | 0.689 | 0.304 |
+| **JODIE-Update** |  |  |  |  |
+| Distance | 0.438 | 0.488 | 0.742 | 0.330 |
+| Time | **0.016** | **0.030** | **0.006** | **0.028** |
+| Distance-Time | 0.438 | 0.488 | 0.742 | 0.330 |
+| Existence | 0.034 | 0.036 | 0.010 | 0.042 |
+| Ours | 0.505 | 0.556 | 0.762 | 0.353 |
 
 ## Real oracle names
 
