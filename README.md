@@ -673,7 +673,7 @@ Since [10] returns a single predicted path, we compare the two approaches using 
 
 <p align="center"><strong>Comparison with [10] on single-future-edge queries.</strong></p>
 
-| Dataset | Oracle | Method | Mean PEE@10 ↓ | Mean NDMSE@10 ↓ | Exact@1 ↑ |
+| Dataset | Oracle | Method | Mean PEE ↓ | Mean NDMSE ↓ | Exact@1 ↑ |
 |---|---|---|---:|---:|---:|
 | **CollegeMsg** | TGN-MaxTime | [10] | **0.168** | **0.080** | **0.484** |
 |  |  | Ours | 0.341 | 0.151 | 0.000 |
