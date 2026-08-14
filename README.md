@@ -366,11 +366,11 @@ We also examine the effect of the number of landmarks on DBLP using the same can
 
 | Landmarks | Edge Recall ↑ | Path Recall ↑ | Runtime (s) ↓ |
 |---:|---:|---:|---:|
-| **1** | 0.315 | 0.270 | **1.958** |
-| 3 | **0.325** | **0.280** | 2.517 |
-| 5 | **0.325** | **0.280** | 2.818 |
+| **1** | 0.895 | 0.850 | **1.851** |
+| 3 | 0.895 | 0.850 | 2.329 |
+| 5 | **0.900** | **0.860** | 2.656 |
 
-Increasing the number of landmarks from one to three provides only a small improvement in edge and path recall, while increasing runtime. Increasing the number further to five provides no additional recovery. We therefore use one landmark for DBLP in the remaining experiments.
+Increasing the number of landmarks from one to three provides no improvement in edge and path recall, while increasing runtime. Increasing the number further to five provides only a small improvement in recovery, at a higher query-processing cost. We therefore use one landmark for DBLP in the remaining experiments.
 
 ### Baselines
 
