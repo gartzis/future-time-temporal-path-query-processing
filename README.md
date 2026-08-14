@@ -9,7 +9,7 @@ under Prediction Uncertainty
 
 <br><br>
 
-<a href="#quick-start">Quick start</a> · <a href="#experiments">Experiments</a> · <a href="#additional-experiments">Additional experiments</a> · <a href="#input-data">Input data</a>
+<a href="#quick-start">Quick start</a> · <a href="#experiments">Experiments</a> · <a href="#input-data">Input data</a> · <a href="#additional-experiments">Additional experiments</a> 
 
 <br><br>
 
