@@ -342,6 +342,7 @@ The paper experiments were run on a machine with 128 CPU threads, 1 TiB RAM, and
 
 
 ## Additional experiments
+[DBLP dataset](#dblp-dataset) · [Baselines](#baselines) · [Comparison with [10]](#comparison-with-the-single-future-edge-method-10)
 
 This section contains additional experiments that complement the evaluation in the paper. They further analyze the path-ranking step, the relation to the previous single-future-edge setting, the occurrence of paths with multiple future temporal edges, and the behavior of the framework on a larger temporal graph.
 
@@ -389,13 +390,13 @@ The methods are:
 * **Ours:** ranks candidate temporal paths by estimated shortest-path probability, which considers both whether a path exists and whether any shorter or earlier candidate path also exists.
 
 
-For this comparison, we use the same path-quality errors as in the main evaluation, but report their mean over the returned paths instead of their score-weighted versions. This gives a common evaluation across methods whose ranking scores have different meanings.
+For this comparison, we use the same path-quality errors as in the main evaluation, but report their unweighted mean over the returned paths instead of the score-weighted versions reported in Table IV of the paper.
 
 We report:
 
 - **PEE:** measures the difference between the predicted and true paths using normalized edit distance.
-- **NDMSE:** measures the normalized difference between the predicted and true path lengths.
-- **NTMSE:** measures the normalized difference between the predicted and true path formation times.
+- **NDMSE:** measures the normalized squared difference between the predicted and true path lengths.
+- **NTMSE:** measures the normalized squared difference between the predicted and true path formation times.
 - **Coverage:** measures the fraction of queries for which at least one future-valid path is returned.
 - **Path Recall@10:** measures whether the true future path appears among the first 10 returned paths.
 - **Path MRR@10:** measures how early the true future path appears in the returned ranking.
@@ -413,7 +414,7 @@ M(\hat{P}_{q,i}, P_q),
 M \in \{\mathrm{PEE}, \mathrm{NDMSE}, \mathrm{NTMSE}, \mathrm{Shorter-path-selection}\}.
 ```
 
-Here, k_q is the number of future-valid paths returned up to k. Mean path-quality errors are averaged over covered queries, while Coverage, Path Recall@k, and Path MRR@k follow the definitions of the main evaluation.
+Here, k_q is the number of future-valid paths returned up to k. Mean path-quality errors are averaged over covered queries, while Coverage, Path Recall@k, and Path MRR@k follow the definitions of the main evaluation. We use k=10, following the main evaluation.
 
 
 <p align="center"><strong>Quality of future-time query answers.</strong></p>
@@ -642,6 +643,8 @@ Oracle / Method | CollegeMsg | Enron | Email-Eu | Bitcoin | DBLP |
 | DisTB | 0.438 | 0.488 | 0.742 | 0.330 | 0.436 |
 | EB | 0.034 | 0.036 | 0.010 | 0.042 | 0.032 |
 | Ours | 0.505 | 0.556 | 0.762 | 0.353 | 0.463 |
+
+Across the 25 oracle-dataset combinations, Ours achieves lower Mean PEE and Mean NDMSE than EB in all cases, and higher Path Recall@10 in 84% of the cases, tying EB in the rest.
 
 
 ### Comparison with the single-future-edge method [10]
