@@ -40,7 +40,13 @@ NUM_RUNS = 10
 
 TOP_K = 10
 
-NUM_LANDMARKS = 5
+NUM_LANDMARKS = {
+    "enron": 5,
+    "email_eu": 5,
+    "collegemsg": 1,
+    "bitcoin": 1,
+    "dblp_edges": 1,
+}
 
 EDGE_THRESHOLD = 0.5
 
@@ -75,7 +81,7 @@ def main() -> None:
 
     runner.TOP_K = TOP_K
 
-    runner.NUM_LANDMARKS = NUM_LANDMARKS
+    runner.NUM_LANDMARKS = NUM_LANDMARKS[DATASET_NAME]
 
     runner.EDGE_THRESHOLD = EDGE_THRESHOLD
 
@@ -97,4 +103,3 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
-

@@ -40,7 +40,13 @@ NUM_RUNS = 10
 
 TOP_K = 10
 
-NUM_LANDMARKS = 5
+NUM_LANDMARKS = {
+    "enron": 5,
+    "email_eu": 5,
+    "collegemsg": 1,
+    "bitcoin": 1,
+    "dblp_edges": 1,
+}
 
 EDGE_THRESHOLD = 0.5
 
@@ -48,7 +54,7 @@ PATH_EXIST_THRESHOLD = 0.0
 
 SHORTEST_PATH_THRESHOLD = 0.0
 
-USE_CACHE = True
+CACHE_SETTINGS = [True, False]
 
 QUERY_SAMPLE_SEED = 42
 
@@ -57,7 +63,7 @@ QUERY_SAMPLE_SEED = 42
 
 
 
-def main() -> None:
+def run(use_cache: bool) -> None:
 
     runner.DATASET_NAME = DATASET_NAME
 
@@ -65,7 +71,7 @@ def main() -> None:
 
     runner.QUERY_TEST_ROOT = QUERY_TEST_ROOT
 
-    runner.OUTPUT_ROOT = OUTPUT_ROOT
+    runner.OUTPUT_ROOT = str(Path(OUTPUT_ROOT) / ("cache_on" if use_cache else "cache_off"))
 
     runner.ORACLE_NAME = ORACLE_NAME
 
@@ -75,7 +81,7 @@ def main() -> None:
 
     runner.TOP_K = TOP_K
 
-    runner.NUM_LANDMARKS = NUM_LANDMARKS
+    runner.NUM_LANDMARKS = NUM_LANDMARKS[DATASET_NAME]
 
     runner.EDGE_THRESHOLD = EDGE_THRESHOLD
 
@@ -83,7 +89,7 @@ def main() -> None:
 
     runner.SHORTEST_PATH_THRESHOLD = SHORTEST_PATH_THRESHOLD
 
-    runner.USE_CACHE = USE_CACHE
+    runner.USE_CACHE = use_cache
 
     runner.QUERY_SAMPLE_SEED = QUERY_SAMPLE_SEED
 
@@ -92,9 +98,16 @@ def main() -> None:
 
 
 
+def main() -> None:
+
+    for use_cache in CACHE_SETTINGS:
+
+        run(use_cache)
+
+
+
 
 
 if __name__ == "__main__":
 
     main()
-

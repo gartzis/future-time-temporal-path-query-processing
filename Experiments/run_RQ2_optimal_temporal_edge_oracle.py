@@ -36,6 +36,7 @@ DATASET_FILES = {
     "email_eu": "email-eu.csv",
     "collegemsg": "collegemsg.csv",
     "bitcoin": "bitcoin.csv",
+    "dblp_edges": "dblp_edges.csv",
 }
 
 QUERY_TEST_FILES = {
@@ -43,9 +44,10 @@ QUERY_TEST_FILES = {
     "email_eu": "email_eu.tsv",
     "collegemsg": "collegemsg.tsv",
     "bitcoin": "bitcoin.tsv",
+    "dblp_edges": "dblp_edges.tsv",
 }
 
-DATASETS = ["enron", "email_eu", "collegemsg", "bitcoin"]
+DATASETS = ["enron", "email_eu", "collegemsg", "bitcoin", "dblp_edges"]
 
 
 def _normalize_dataset_name(name: str) -> str:
@@ -62,6 +64,7 @@ def _normalize_dataset_name(name: str) -> str:
         "ia_enron_employees_timestampzero_noduplicate_sorted": "enron",
         "email_eu_core_temporal_timestampzero_noduplicate_sorted": "email_eu",
         "collegemsg_timestampzero_noduplicate_sorted": "collegemsg",
+        "dblp": "dblp_edges",
     }
     return aliases.get(key, key)
 
@@ -329,6 +332,7 @@ def main() -> None:
         results_dir = BASE_DIR / results_dir
     results_dir.mkdir(parents=True, exist_ok=True)
     summary_rows = []
+    heatmap_rows = []
     print("RQ2 optimal temporal-edge oracle")
     for dataset_name in _active_datasets():
         csv_path = _resolve_dataset_path(str(dataset_name))
@@ -370,7 +374,8 @@ def main() -> None:
                         f"shortest_proba_bound={shortest_proba_bound}"
                     )
                     predictions = []
-                    for row in tests_df[["source", "destination", "time"]].itertuples(index=False):
+                    exact_matches = 0
+                    for row in tests_df[["source", "destination", "time", "future_Path"]].itertuples(index=False):
                         prediction = _run_one_query(
                             src=int(row.source),
                             dst=int(row.destination),
@@ -388,6 +393,8 @@ def main() -> None:
                         if prediction is None:
                             continue
                         _, nodes, t_pred, p_sp, p_exist = prediction
+                        true_nodes = [int(float(value.strip())) for value in str(row.future_Path).strip().strip("[]").replace("->", ",").split(",") if value.strip()]
+                        exact_matches += int(nodes == true_nodes)
                         predictions.append(
                             {
                                 "source": int(row.source),
@@ -433,12 +440,25 @@ def main() -> None:
                             "existence_bound": existence_bound,
                             "shortest_proba_bound": shortest_proba_bound,
                             "predictions_found": len(predictions),
+                            "coverage": len(predictions) / len(tests_df) if len(tests_df) else 0.0,
+                            "exact_match": exact_matches / len(tests_df) if len(tests_df) else 0.0,
                             "output_file": str(out_file),
+                        }
+                    )
+                    heatmap_rows.append(
+                        {
+                            "dataset": key,
+                            "edge_probability": edge_proba,
+                            "path_existence_threshold": existence_bound,
+                            "shortest_path_threshold": shortest_proba_bound,
+                            "coverage": len(predictions) / len(tests_df) if len(tests_df) else 0.0,
+                            "exact_match": exact_matches / len(tests_df) if len(tests_df) else 0.0,
                         }
                     )
         print(f"Done: {key}")
     summary_file = results_dir / "probability_threshold_test_summary.tsv"
     pd.DataFrame(summary_rows).to_csv(summary_file, sep="\t", index=False)
+    pd.DataFrame(heatmap_rows).to_csv(results_dir / "heatmap_values.tsv", sep="\t", index=False)
     print(f"\nSaved summary: {summary_file}")
 
 

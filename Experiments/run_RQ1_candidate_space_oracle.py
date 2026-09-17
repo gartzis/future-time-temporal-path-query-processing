@@ -67,6 +67,8 @@ DATASETS = [
 
     ("Data/Datasets/bitcoin.csv", -1),
 
+    ("Data/Datasets/dblp_edges.csv", -1),
+
 ]
 
 
@@ -3965,4 +3967,3 @@ def main():
 if __name__ == "__main__":
 
     main()
-
