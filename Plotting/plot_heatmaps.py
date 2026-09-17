@@ -18,6 +18,8 @@ INPUT_FILE = Path("Results/RQ2_optimal_temporal_edge_oracle/heatmap_values.tsv")
 
 OUTPUT_FILE = Path("Results/figures/rq2_heatmap.png")
 
+DATASET = "enron"
+
 
 
 
@@ -29,6 +31,8 @@ def main() -> None:
         raise FileNotFoundError(f"Input file not found: {INPUT_FILE}")
 
     df = pd.read_csv(INPUT_FILE, sep="\t")
+
+    df = df[df["dataset"] == DATASET].copy()
 
     pivot = df.pivot(index="edge_probability", columns="shortest_path_threshold", values="coverage")
 
@@ -59,4 +63,3 @@ def main() -> None:
 if __name__ == "__main__":
 
     main()
-
