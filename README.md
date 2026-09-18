@@ -87,7 +87,7 @@ depending on the script.
 ├── Helpers/
 ├── Data/
 ├── External/
-└── Results/
+└── Results/        # generated when experiments are run
 ```
 
 ## Main files
